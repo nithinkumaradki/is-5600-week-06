@@ -7,14 +7,16 @@ const CardList = ({ data = [] }) => {
   const limit = 10;
 
   const [offset, setOffset] = useState(0);
-  const [products, setProducts] = useState(data.slice(0, limit));
+  const [filteredData, setFilteredData] = useState(data);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
+    setFilteredData(data);
     setProducts(data.slice(offset, offset + limit));
-  }, [offset, data]);
+  }, [data, offset]);
 
   const handlePage = (direction) => {
-    if (direction === "next" && offset + limit < data.length) {
+    if (direction === "next" && offset + limit < filteredData.length) {
       setOffset(offset + limit);
     }
 
@@ -26,11 +28,17 @@ const CardList = ({ data = [] }) => {
   const filterTags = (searchTerm) => {
     const term = searchTerm.toLowerCase();
 
+    if (term === "") {
+      setFilteredData(data);
+      setOffset(0);
+      return;
+    }
+
     const filtered = data.filter((product) =>
       product.tags.some((tag) => tag.toLowerCase().includes(term))
     );
 
-    setProducts(filtered.slice(0, limit));
+    setFilteredData(filtered);
     setOffset(0);
   };
 
